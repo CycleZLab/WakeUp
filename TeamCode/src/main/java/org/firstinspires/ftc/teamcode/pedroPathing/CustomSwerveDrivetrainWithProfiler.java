@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
-import static com.pedropathing.math.MathFunctions.clamp;
 import static com.pedropathing.math.MathFunctions.findNormalizingScaling;
 
 import com.pedropathing.Drivetrain;
@@ -20,7 +19,7 @@ import org.firstinspires.ftc.teamcode.mathUtil.PolarVector;
 import java.util.Arrays;
 import java.util.List;
 
-public class CustomSwerveDrivetrain extends Drivetrain {
+public class CustomSwerveDrivetrainWithProfiler extends Drivetrain {
     private final DcMotorEx leftFrontMotor;
     private final DcMotorEx leftRearMotor;
     private final DcMotorEx rightFrontMotor;
@@ -56,7 +55,7 @@ public class CustomSwerveDrivetrain extends Drivetrain {
 
     public CustomSwerveConstants constants;
 
-    public CustomSwerveDrivetrain(HardwareMap hardwareMap, CustomSwerveConstants swerveConstants) {
+    public CustomSwerveDrivetrainWithProfiler(HardwareMap hardwareMap, CustomSwerveConstants swerveConstants) {
         constants = swerveConstants;
 
         this.motorCachingThreshold = swerveConstants.motorCachingThreshold;

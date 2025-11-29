@@ -36,7 +36,6 @@ public class Constants {
             ;
 
     public static CustomSwerveConstants swerveConstants = new CustomSwerveConstants();
-
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .setDrivetrain(new CustomSwerveDrivetrain(hardwareMap, swerveConstants))
