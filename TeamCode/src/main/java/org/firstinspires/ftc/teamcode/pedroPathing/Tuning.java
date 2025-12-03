@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.changes;
-import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.drawOnlyCurrent;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.draw;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.drawOnlyCurrent;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.stopRobot;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.telemetryM;
@@ -16,11 +16,15 @@ import com.bylazar.field.Style;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.*;
-import com.pedropathing.math.*;
-import com.pedropathing.paths.*;
+import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
+import com.pedropathing.paths.HeadingInterpolator;
+import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
 import com.pedropathing.telemetry.SelectableOpMode;
-import com.pedropathing.util.*;
+import com.pedropathing.util.PoseHistory;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -326,6 +330,8 @@ class TurnTuner extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class ForwardVelocityTuner extends OpMode {
+    CustomSwerveConstants sc = new CustomSwerveConstants();
+    CustomSwerveDrivetrain customSwerveDrivetrain;
     private final ArrayList<Double> velocities = new ArrayList<>();
     public static double DISTANCE = 48;
     public static double RECORD_NUMBER = 10;
@@ -333,7 +339,9 @@ class ForwardVelocityTuner extends OpMode {
     private boolean end;
 
     @Override
-    public void init() {}
+    public void init() {
+       customSwerveDrivetrain = new CustomSwerveDrivetrain(hardwareMap, sc);
+    }
 
     /** This initializes the drive motors as well as the cache of velocities and the Panels telemetry. */
     @Override
@@ -355,7 +363,7 @@ class ForwardVelocityTuner extends OpMode {
         for (int i = 0; i < RECORD_NUMBER; i++) {
             velocities.add(0.0);
         }
-        follower.startTeleopDrive(true);
+//        follower.startTeleopDrive(true);
         follower.update();
         end = false;
     }
@@ -382,7 +390,8 @@ class ForwardVelocityTuner extends OpMode {
                 end = true;
                 stopRobot();
             } else {
-                follower.setTeleOpDrive(1,0,0,true);
+                customSwerveDrivetrain.arcadeDrive(1,0,0);
+//                follower.setTeleOpDrive(1,0,0,true);
                 //double currentVelocity = Math.abs(follower.getVelocity().getXComponent());
                 double currentVelocity = Math.abs(follower.poseTracker.getLocalizer().getVelocity().getX());
                 velocities.add(currentVelocity);
@@ -431,6 +440,8 @@ class ForwardVelocityTuner extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class LateralVelocityTuner extends OpMode {
+    CustomSwerveConstants sc = new CustomSwerveConstants();
+    CustomSwerveDrivetrain customSwerveDrivetrain;
     private final ArrayList<Double> velocities = new ArrayList<>();
 
     public static double DISTANCE = 48;
@@ -439,7 +450,9 @@ class LateralVelocityTuner extends OpMode {
     private boolean end;
 
     @Override
-    public void init() {}
+    public void init() {
+        customSwerveDrivetrain = new CustomSwerveDrivetrain(hardwareMap, sc);
+    }
 
     /**
      * This initializes the drive motors as well as the cache of velocities and the Panels
@@ -463,7 +476,7 @@ class LateralVelocityTuner extends OpMode {
         for (int i = 0; i < RECORD_NUMBER; i++) {
             velocities.add(0.0);
         }
-        follower.startTeleopDrive(true);
+//        follower.startTeleopDrive(true);
         follower.update();
     }
 
@@ -488,7 +501,8 @@ class LateralVelocityTuner extends OpMode {
                 end = true;
                 stopRobot();
             } else {
-                follower.setTeleOpDrive(0,1,0,true);
+                customSwerveDrivetrain.arcadeDrive(0, 1, 0);
+//                follower.setTeleOpDrive(0,1,0,true);
                 double currentVelocity = Math.abs(follower.getVelocity().dot(new Vector(1, Math.PI / 2)));
                 velocities.add(currentVelocity);
                 velocities.remove(0);
@@ -531,8 +545,10 @@ class LateralVelocityTuner extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class ForwardZeroPowerAccelerationTuner extends OpMode {
+    CustomSwerveConstants sc = new CustomSwerveConstants();
+    CustomSwerveDrivetrain customSwerveDrivetrain;
     private final ArrayList<Double> accelerations = new ArrayList<>();
-    public static double VELOCITY = 30;
+    public static double VELOCITY = 50;
 
     private double previousVelocity;
     private long previousTimeNano;
@@ -541,7 +557,9 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
     private boolean end;
 
     @Override
-    public void init() {}
+    public void init() {
+        customSwerveDrivetrain = new CustomSwerveDrivetrain(hardwareMap, sc);
+    }
 
     /** This initializes the drive motors as well as the Panels telemetryM. */
     @Override
@@ -559,9 +577,10 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
     /** This starts the OpMode by setting the drive motors to run forward at full power. */
     @Override
     public void start() {
-        follower.startTeleopDrive(false);
+//        follower.startTeleopDrive(false);
         follower.update();
-        follower.setTeleOpDrive(1,0,0,true);
+        customSwerveDrivetrain.arcadeDrive(1,0,0);
+//        follower.setTeleOpDrive(1,0,0,true);
     }
 
     /**
@@ -587,7 +606,10 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
                     previousVelocity = follower.getVelocity().dot(heading);
                     previousTimeNano = System.nanoTime();
                     stopping = true;
-                    follower.setTeleOpDrive(0,0,0,true);
+                    customSwerveDrivetrain.arcadeDrive(0,0,0);
+//                    follower.setTeleOpDrive(0,0,0,true);
+                } else {
+                    customSwerveDrivetrain.arcadeDrive(1,0,0);
                 }
             } else {
                 double currentVelocity = follower.getVelocity().dot(heading);
@@ -635,15 +657,19 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
  * @version 1.0, 3/13/2024
  */
 class LateralZeroPowerAccelerationTuner extends OpMode {
+    CustomSwerveConstants sc = new CustomSwerveConstants();
+    CustomSwerveDrivetrain customSwerveDrivetrain;
     private final ArrayList<Double> accelerations = new ArrayList<>();
-    public static double VELOCITY = 30;
+    public static double VELOCITY = 50;
     private double previousVelocity;
     private long previousTimeNano;
     private boolean stopping;
     private boolean end;
 
     @Override
-    public void init() {}
+    public void init() {
+        customSwerveDrivetrain = new CustomSwerveDrivetrain(hardwareMap, sc);
+    }
 
     /** This initializes the drive motors as well as the Panels telemetry. */
     @Override
@@ -661,9 +687,10 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
     /** This starts the OpMode by setting the drive motors to run forward at full power. */
     @Override
     public void start() {
-        follower.startTeleopDrive(false);
+//        follower.startTeleopDrive(false);
         follower.update();
-        follower.setTeleOpDrive(0,1,0,true);
+        customSwerveDrivetrain.arcadeDrive(0, 1, 0);
+//        follower.setTeleOpDrive(0,1,0,true);
     }
 
     /**
@@ -689,7 +716,10 @@ class LateralZeroPowerAccelerationTuner extends OpMode {
                     previousVelocity = Math.abs(follower.getVelocity().dot(heading));
                     previousTimeNano = System.nanoTime();
                     stopping = true;
-                    follower.setTeleOpDrive(0,0,0,true);
+//                    follower.setTeleOpDrive(0,0,0,true);
+                    customSwerveDrivetrain.arcadeDrive(0, 0, 0);
+                } else {
+                    customSwerveDrivetrain.arcadeDrive(0, 1, 0);
                 }
             } else {
                 double currentVelocity = Math.abs(follower.getVelocity().dot(heading));

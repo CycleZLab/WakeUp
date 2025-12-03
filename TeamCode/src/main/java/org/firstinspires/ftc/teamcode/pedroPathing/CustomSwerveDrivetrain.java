@@ -383,7 +383,6 @@ public class CustomSwerveDrivetrain extends Drivetrain {
                 : findNormalizingScaling(staticVector, variableVector, maxPowerScaling);
         return variableVector.times(scalingFactor);
     }
-
     @Override
     public void runDrive(Vector correctivePower, Vector headingPower, Vector pathingPower, double robotHeading) {
         double[] calculatedDrive = calculateDrive(correctivePower, headingPower, pathingPower, robotHeading);
